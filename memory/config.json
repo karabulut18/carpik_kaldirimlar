@@ -1,0 +1,6 @@
+{
+  "prompt_count": 10,
+  "archive_threshold": 20,
+  "current_log": "memory/current_log.md",
+  "abstract": "Project started: Building a writing sharing platform. Initial pages planned: Home, Explore, Search, Post View, Dashboard, Profile, Auth."
+}
