@@ -77,6 +77,11 @@ Major feature implementations:
 ### Entry 11 [2026-01-07 20:13:28]
 **Change Abstract:** Completed Security Audit, Refactored User Model, and Enforced Strict Access Control.
 
+- **[2026-01-07] User Profile Navigation & Fixes**
+  - **Feature:** Added `PublicUserView` to view user profiles (Avatar, Bio, Posts).
+  - **Feature:** Made author names clickable in `PostCard` and `PostDetailView` to navigate to `PublicUserView`.
+  - **Fix:** Added safety checks to prevent clicking author names on legacy posts (missing `authorId`), resolving a `GoException` crash.
+  - **Refactor:** Added `getUser(uid)` to `AuthService` for clean public profile fetching.
 **Details:**
 1. **Security Audit**: Patched authorization vulnerability in post editing.
 2. **Access Control**: Implemented strict firestore.rules (restricted updates to authors, prevented role escalation).

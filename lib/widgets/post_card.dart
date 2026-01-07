@@ -1,5 +1,6 @@
 import 'package:carpik_kaldirimlar/models/post.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class PostCard extends StatelessWidget {
@@ -35,11 +36,19 @@ class PostCard extends StatelessWidget {
               const SizedBox(height: 8),
               Row(
                 children: [
-                  Text(
-                    post.author,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.secondary,
-                      fontWeight: FontWeight.bold,
+                  InkWell(
+                    onTap: () {
+                      if (post.authorId.isNotEmpty && 
+                          GoRouter.of(context).routerDelegate.currentConfiguration.uri.path != '/user/${post.authorId}') {
+                        context.push('/user/${post.authorId}');
+                      }
+                    },
+                    child: Text(
+                      post.author,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.secondary,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),

@@ -7,6 +7,7 @@ import 'package:carpik_kaldirimlar/views/home_view.dart';
 import 'package:carpik_kaldirimlar/views/login_view.dart';
 import 'package:carpik_kaldirimlar/views/post_detail_view.dart';
 import 'package:carpik_kaldirimlar/views/profile_view.dart';
+import 'package:carpik_kaldirimlar/views/public_user_view.dart';
 import 'package:carpik_kaldirimlar/views/register_view.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -133,6 +134,13 @@ class AppRouter {
                  return const HomeView(); // Redirect to home if not admin
               }
               return const AdminPanelView();
+            },
+          ),
+          GoRoute(
+            path: '/user/:userId',
+            builder: (context, state) {
+              final userId = state.pathParameters['userId']!;
+              return PublicUserView(userId: userId);
             },
           ),
         ],

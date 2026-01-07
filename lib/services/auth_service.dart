@@ -183,4 +183,15 @@ class AuthService extends ChangeNotifier {
       rethrow;
     }
   }
+  Future<AppUser?> getUser(String uid) async {
+    try {
+      final doc = await _firestore.collection('users').doc(uid).get();
+      if (doc.exists) {
+        return AppUser.fromMap(doc.id, doc.data()!);
+      }
+    } catch (e) {
+      debugPrint('Error fetching user $uid: $e');
+    }
+    return null;
+  }
 }

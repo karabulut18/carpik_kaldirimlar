@@ -108,9 +108,19 @@ class _PostDetailViewState extends State<PostDetailView> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          post.author,
-                          style: theme.textTheme.titleMedium,
+                        InkWell(
+                          onTap: () {
+                             if (post.authorId.isNotEmpty) {
+                               context.push('/user/${post.authorId}');
+                             }
+                          },
+                          child: Text(
+                            post.author,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              decoration: post.authorId.isNotEmpty ? TextDecoration.underline : null,
+                              decorationColor: theme.colorScheme.primary,
+                            ),
+                          ),
                         ),
                         Row(
                           children: [
