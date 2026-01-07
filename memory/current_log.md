@@ -73,3 +73,12 @@ Major feature implementations:
 4. **Search**: Client-side filtering by title/author on Explore page.
 5. **Profile**: Editable Bio with Markdown support.
 6. **Polishing**: Fixed compilation errors, resolved poetry formatting, and drafted production-ready Firestore Security Rules.
+
+### Entry 11 [2026-01-07 20:13:28]
+**Change Abstract:** Completed Security Audit, Refactored User Model, and Enforced Strict Access Control.
+
+**Details:**
+1. **Security Audit**: Patched authorization vulnerability in post editing.
+2. **Access Control**: Implemented strict firestore.rules (restricted updates to authors, prevented role escalation).
+3. **Refactoring**: Created AppUser model to encapsulate user data.
+4. **Sanitization**: Added link sanitization for markdown.

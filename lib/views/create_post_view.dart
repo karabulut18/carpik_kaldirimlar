@@ -34,8 +34,25 @@ class _CreatePostViewState extends State<CreatePostView> {
   }
 
   void _loadPost() {
-    final post = context.read<PostService>().getPost(widget.postId!);
+    final postService = context.read<PostService>();
+    final authService = context.read<AuthService>();
+    final post = postService.getPost(widget.postId!);
+    
     if (post != null) {
+      // Security Check: Ensure current user is the author
+      if (post.authorId != authService.currentUserId) {
+        // Schedule the navigation to happen after the build phase
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+             ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Bu yazıyı düzenleme yetkiniz yok.')),
+            );
+            context.go('/dashboard');
+          }
+        });
+        return;
+      }
+
       _titleController.text = post.title;
       _excerptController.text = post.excerpt ?? '';
       _contentController.text = post.content ?? '';
@@ -58,6 +75,10 @@ class _CreatePostViewState extends State<CreatePostView> {
            // Real app might want to fetch original first.
            final originalPost = postService.getPost(widget.postId!);
            
+           if (originalPost?.authorId != authService.currentUserId) {
+              throw Exception('Yetkisiz işlem: Bu yazıyı düzenleyemezsiniz.');
+           }
+
            final updatedPost = Post(
             id: widget.postId!,
             title: _titleController.text,

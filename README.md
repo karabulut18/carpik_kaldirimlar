@@ -34,6 +34,18 @@ A modern, social blogging platform built with **Flutter Web** and **Firebase**.
 - **Role-Based Access**: Secure Admin Panel accessible only to users with `role: 'admin'`.
 - **User Management**: View all users, ban/unban capabilities (UI ready).
 - **Dashboard**: Quick stats overview.
+- **Strict Authorization**: Admins can moderations (delete) but cannot edit user content.
+
+### 🛡️ Security Architecture
+- **Firestore Rules**: Strict, role-based backend security policies.
+- **Input Sanitization**: Markdown link sanitization to prevent XSS.
+- **Authorization**: Double-verification (UI + Logic) for all write operations.
+- **Data Integrity**: User roles are protected from client-side manipulation.
+
+### 🧑‍💻 Developer Experience
+- **Smart Logger**: An AI-powered CLI tool (`memory/logger.py`) that automatically generates semantic git commit messages and project log entries.
+  - Powered by **Google Gemini 2.0 Flash**.
+  - Context-aware: Reads your project history to match your logging style.
 
 ## 🛠️ Tech Stack
 
@@ -74,7 +86,13 @@ A modern, social blogging platform built with **Flutter Web** and **Firebase**.
     - **IMPORTANT**: Update your Firestore Rules to allow proper access.
     - Admins need `role: 'admin'` in their user document.
 
-5.  **Run**
+5.  **Environment Variables (Optional)**
+    - To use the **Smart Logger**, create a `.env` file in the root:
+      ```env
+      GEMINI_API_KEY=your_api_key_here
+      ```
+
+6.  **Run**
     ```bash
     flutter run -d chrome
     ```

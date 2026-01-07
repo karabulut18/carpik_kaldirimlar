@@ -75,10 +75,11 @@ class _PostDetailViewState extends State<PostDetailView> {
     return Scaffold(
       appBar: AppBar(
         actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () => context.go('/dashboard/edit/${post.id}'),
-          ),
+          if (currentUserId == post.authorId)
+            IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () => context.go('/dashboard/edit/${post.id}'),
+            ),
         ],
       ),
       body: SingleChildScrollView(
@@ -183,10 +184,10 @@ class _PostDetailViewState extends State<PostDetailView> {
                         color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
                       ),
                     ),
-                  onTapLink: (text, href, title) async {
+                    onTapLink: (text, href, title) async {
                     if (href != null) {
                       final uri = Uri.tryParse(href);
-                      if (uri != null) {
+                      if (uri != null && (uri.isScheme('http') || uri.isScheme('https'))) {
                         await launchUrl(uri);
                       }
                     }

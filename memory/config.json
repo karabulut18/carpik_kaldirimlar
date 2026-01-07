@@ -1,6 +1,7 @@
 {
-  "prompt_count": 10,
+  "prompt_count": 11,
   "archive_threshold": 20,
+  "usage": "python3 memory/logger.py --smart",
   "current_log": "memory/current_log.md",
   "abstract": "Project started: Building a writing sharing platform. Initial pages planned: Home, Explore, Search, Post View, Dashboard, Profile, Auth."
 }

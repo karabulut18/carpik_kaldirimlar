@@ -61,3 +61,5 @@ firebase-debug.log.*
 # Android
 **/android/.gradle
 **/android/local.properties
+
+**/.env
