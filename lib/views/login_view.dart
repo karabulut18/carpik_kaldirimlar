@@ -1,4 +1,5 @@
 import 'package:carpik_kaldirimlar/services/auth_service.dart';
+import 'package:carpik_kaldirimlar/utils/auth_exception_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -29,7 +30,7 @@ class _LoginViewState extends State<LoginView> {
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Giriş başarısız: ${e.toString().split(']').last.trim()}')),
+            SnackBar(content: Text('Giriş başarısız: ${AuthExceptionHelper.generateErrorMessage(e)}')),
           );
         }
       } finally {

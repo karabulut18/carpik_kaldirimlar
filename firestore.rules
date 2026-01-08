@@ -1,62 +1,7 @@
-rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // Helper function to check if user is admin
-    function isAdmin() {
-      // Check custom claim or role in user document
-      // Note: Reading the user doc for every request costs a read operations.
-      // Ideally use Custom Claims. For this simple app, we check the 'users' collection.
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
-    }
-
-    // Helper function to check if user is signed in
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
-    // Users Collection
-    match /users/{userId} {
-      // Anyone can read user profiles (needed for author info)
-      allow read: if true;
-      
-      // Users can create their own profile
-      allow create: if isSignedIn() && request.auth.uid == userId;
-
-      // Users can update their own profile, BUT cannot change the 'role' field
-      allow update: if isSignedIn() && request.auth.uid == userId 
-                    && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']));
-
-      // Only admins can delete users
-      allow delete: if isSignedIn() && isAdmin();
-    }
-
-    // Posts Collection
-    match /posts/{postId} {
-      // Anyone can read posts
-      allow read: if true;
-
-      // Authenticated users can create posts
-      allow create: if isSignedIn() 
-                    && request.resource.data.authorId == request.auth.uid;
-
-      // Authors can update their own posts
-      allow update: if isSignedIn() 
-                    && (resource.data.authorId == request.auth.uid);
-
-      // Authors and Admins can delete posts
-      allow delete: if isSignedIn() 
-                    && (resource.data.authorId == request.auth.uid || isAdmin());
-    }
-    
-    // Comments Subcollection (assuming comments are subcollection of posts, based on audit findings, actually they seem to be separate or subcollection, let's check code)
-    // Checking code: post_service.dart: collection('posts').doc(postId).collection('comments')
-    
-    match /posts/{postId}/comments/{commentId} {
-        allow read: if true;
-        allow create: if isSignedIn();
-        allow delete: if isSignedIn() && (resource.data.authorId == request.auth.uid || isAdmin());
+    match /{document=**} {
+      allow read, write: if true;
     }
   }
 }

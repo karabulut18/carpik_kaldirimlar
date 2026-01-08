@@ -15,6 +15,8 @@ class PostService extends ChangeNotifier {
         return Post.fromMap(doc.id, doc.data() as Map<String, dynamic>);
       }).toList();
       notifyListeners();
+    }, onError: (error) {
+      debugPrint('Error listening to posts: $error');
     });
   }
 
@@ -54,8 +56,12 @@ class PostService extends ChangeNotifier {
     }
   }
 
+  // Top-level comments collection
+  final CollectionReference _commentsCollection = FirebaseFirestore.instance.collection('comments');
+
   Future<void> addComment(String postId, String text, String authorName, String authorId) async {
-    await _postsCollection.doc(postId).collection('comments').add({
+    await _commentsCollection.add({
+      'postId': postId,
       'text': text,
       'authorName': authorName,
       'authorId': authorId,
@@ -64,18 +70,30 @@ class PostService extends ChangeNotifier {
   }
 
   Future<void> deleteComment(String postId, String commentId) async {
-    await _postsCollection.doc(postId).collection('comments').doc(commentId).delete();
+    // postId parameter kept for compatibility, but not strictly needed for deletion by ID
+    await _commentsCollection.doc(commentId).delete();
   }
 
   Stream<List<Comment>> getCommentsStream(String postId) {
-    return _postsCollection
-        .doc(postId)
-        .collection('comments')
+    return _commentsCollection
+        .where('postId', isEqualTo: postId)
         .orderBy('date', descending: true)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((doc) {
-        return Comment.fromMap(doc.id, doc.data());
+        return Comment.fromMap(doc.id, doc.data() as Map<String, dynamic>);
+      }).toList();
+    });
+  }
+
+  Stream<List<Comment>> getUserComments(String userId) {
+    return _commentsCollection
+        .where('authorId', isEqualTo: userId)
+        .orderBy('date', descending: true)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        return Comment.fromMap(doc.id, doc.data() as Map<String, dynamic>);
       }).toList();
     });
   }

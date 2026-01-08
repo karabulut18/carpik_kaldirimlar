@@ -78,7 +78,7 @@ class _PostDetailViewState extends State<PostDetailView> {
           if (currentUserId == post.authorId)
             IconButton(
               icon: const Icon(Icons.edit),
-              onPressed: () => context.go('/dashboard/edit/${post.id}'),
+              onPressed: () => context.go('/edit-post/${post.id}'),
             ),
         ],
       ),
@@ -151,7 +151,7 @@ class _PostDetailViewState extends State<PostDetailView> {
                         icon: Icon(isLiked ? Icons.favorite : Icons.favorite_border),
                         label: Text(isLiked ? 'Beğendin' : 'Beğen'),
                         style: FilledButton.styleFrom(
-                          backgroundColor: isLiked ? Colors.red.withOpacity(0.1) : null,
+                          backgroundColor: isLiked ? Colors.red.withValues(alpha: 0.1) : null,
                           foregroundColor: isLiked ? Colors.red : null,
                         ),
                       ),
@@ -191,7 +191,7 @@ class _PostDetailViewState extends State<PostDetailView> {
                       ),
                       blockquoteDecoration: BoxDecoration(
                         border: Border(left: BorderSide(color: theme.colorScheme.primary, width: 4)),
-                        color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
                       ),
                     ),
                     onTapLink: (text, href, title) async {

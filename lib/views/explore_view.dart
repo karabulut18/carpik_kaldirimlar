@@ -1,4 +1,3 @@
-import 'package:carpik_kaldirimlar/models/post.dart';
 import 'package:carpik_kaldirimlar/services/post_service.dart';
 import 'package:carpik_kaldirimlar/widgets/post_card.dart';
 import 'package:flutter/material.dart';

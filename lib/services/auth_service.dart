@@ -161,22 +161,26 @@ class AuthService extends ChangeNotifier {
         GoogleAuthProvider authProvider = GoogleAuthProvider();
         credential = await _auth.signInWithPopup(authProvider);
       } else {
-        final GoogleSignIn googleSignIn = GoogleSignIn();
-        final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+        // Initialize the singleton
+        await GoogleSignIn.instance.initialize();
         
-        if (googleUser == null) return; 
+        // Use authenticate() instead of signIn()
+        final googleUser = await GoogleSignIn.instance.authenticate();
+        
+ 
 
-        final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+        // authentication is now synchronous and accessToken is removed
+        final GoogleSignInAuthentication googleAuth = googleUser.authentication;
         final AuthCredential cred = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken,
           idToken: googleAuth.idToken,
+          // accessToken: googleAuth.accessToken, // Removed in v7
         );
 
         credential = await _auth.signInWithCredential(cred);
       }
 
-      if (credential?.user != null) {
-        await _syncUserToFirestore(credential!.user!);
+      if (credential.user != null) {
+        await _syncUserToFirestore(credential.user!);
       }
     } catch (e) {
       debugPrint('Google Sign-In Error: $e');

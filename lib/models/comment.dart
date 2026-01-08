@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Comment {
+  final String postId; // Added field
   final String id;
   final String text;
   final String authorName;
@@ -9,6 +10,7 @@ class Comment {
 
   Comment({
     required this.id,
+    required this.postId,
     required this.text,
     required this.authorName,
     required this.authorId,
@@ -17,6 +19,7 @@ class Comment {
 
   Map<String, dynamic> toMap() {
     return {
+      'postId': postId,
       'text': text,
       'authorName': authorName,
       'authorId': authorId,
@@ -37,6 +40,7 @@ class Comment {
 
     return Comment(
       id: id,
+      postId: map['postId'] ?? '', // Handle missing postId for legacy/error cases
       text: map['text'] ?? '',
       authorName: map['authorName'] ?? 'Anonymous',
       authorId: map['authorId'] ?? '',

@@ -1,1 +1,17 @@
-{"flutter":{"platforms":{"dart":{"lib/firebase_options.dart":{"projectId":"carpik-kaldirimlar","configurations":{"web":"1:253455958468:web:315ca4bfd641f225576491"}}}}}}
+{
+    "flutter": {
+        "platforms": {
+            "dart": {
+                "lib/firebase_options.dart": {
+                    "projectId": "carpik-kaldirimlar",
+                    "configurations": {
+                        "web": "1:253455958468:web:315ca4bfd641f225576491"
+                    }
+                }
+            }
+        }
+    },
+    "firestore": {
+        "rules": "firestore.rules"
+    }
+}

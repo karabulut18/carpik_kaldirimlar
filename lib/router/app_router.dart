@@ -1,7 +1,7 @@
 import 'package:carpik_kaldirimlar/services/auth_service.dart';
 import 'package:carpik_kaldirimlar/views/admin_panel_view.dart';
 import 'package:carpik_kaldirimlar/views/create_post_view.dart';
-import 'package:carpik_kaldirimlar/views/dashboard_view.dart';
+
 import 'package:carpik_kaldirimlar/views/explore_view.dart';
 import 'package:carpik_kaldirimlar/views/home_view.dart';
 import 'package:carpik_kaldirimlar/views/login_view.dart';
@@ -19,13 +19,9 @@ class AppRouter {
   static final router = GoRouter(
     initialLocation: '/',
     redirect: (context, state) {
-      final authService = context.read<AuthService>();
-      final isLoggedIn = authService.isLoggedIn;
-      final isGoingToDashboard = state.uri.path.startsWith('/dashboard');
 
-      if (isGoingToDashboard && !isLoggedIn) {
-        return '/login';
-      }
+
+
       
       return null;
     },
@@ -91,22 +87,17 @@ class AppRouter {
             path: '/register',
             builder: (context, state) => const RegisterView(),
           ),
+
           GoRoute(
-            path: '/dashboard',
-            builder: (context, state) => const DashboardView(),
-            routes: [
-              GoRoute(
-                path: 'create',
-                builder: (context, state) => const CreatePostView(),
-              ),
-              GoRoute(
-                path: 'edit/:postId',
-                builder: (context, state) {
-                  final postId = state.pathParameters['postId'];
-                  return CreatePostView(postId: postId);
-                },
-              ),
-            ],
+            path: '/create-post',
+            builder: (context, state) => const CreatePostView(),
+          ),
+          GoRoute(
+            path: '/edit-post/:postId',
+            builder: (context, state) {
+              final postId = state.pathParameters['postId'];
+              return CreatePostView(postId: postId);
+            },
           ),
           GoRoute(
             path: '/post/:postId',
@@ -118,7 +109,6 @@ class AppRouter {
           GoRoute(
             path: '/profile',
             builder: (context, state) {
-              // Simple inline protection for double check
               if (!context.read<AuthService>().isLoggedIn) {
                 return const LoginView();
               }
@@ -127,14 +117,14 @@ class AppRouter {
           ),
           GoRoute(
             path: '/admin',
-            builder: (context, state) {
-              // Simple inline protection
-              final auth = context.read<AuthService>();
-              if (!auth.isLoggedIn || !auth.isAdmin) {
-                 return const HomeView(); // Redirect to home if not admin
-              }
-              return const AdminPanelView();
+            redirect: (context, state) {
+               final auth = context.read<AuthService>();
+               if (!auth.isLoggedIn || !auth.isAdmin) {
+                 return '/';
+               }
+               return null;
             },
+            builder: (context, state) => const AdminPanelView(),
           ),
           GoRoute(
             path: '/user/:userId',
@@ -189,10 +179,10 @@ class _UserMenu extends StatelessWidget {
         if (value == 'logout') {
           context.read<AuthService>().logout();
           context.go('/');
-        } else if (value == 'dashboard') {
-          context.go('/dashboard');
+        } else if (value == 'admin') {
+          context.go('/admin');
         } else if (value == 'create') {
-          context.go('/dashboard/create');
+          context.go('/create-post');
         } else if (value == 'profile') {
           context.go('/profile');
         }
@@ -214,7 +204,7 @@ class _UserMenu extends StatelessWidget {
       itemBuilder: (context) {
         final isAdmin = context.read<AuthService>().isAdmin;
         return [
-        if (isAdmin)
+        if (isAdmin) ...[
           const PopupMenuItem(
             value: 'admin',
             child: Row(
@@ -225,16 +215,8 @@ class _UserMenu extends StatelessWidget {
               ],
             ),
           ),
-        const PopupMenuItem(
-          value: 'dashboard',
-          child: Row(
-            children: [
-              Icon(Icons.dashboard),
-              SizedBox(width: 8),
-              Text('Panel'),
-            ],
-          ),
-        ),
+
+        ],
         const PopupMenuItem(
           value: 'create',
           child: Row(

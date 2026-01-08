@@ -1,4 +1,5 @@
 import 'package:carpik_kaldirimlar/services/auth_service.dart';
+import 'package:carpik_kaldirimlar/utils/auth_exception_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -31,7 +32,7 @@ class _RegisterViewState extends State<RegisterView> {
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Kayıt başarısız: ${e.toString().split(']').last.trim()}')),
+            SnackBar(content: Text('Kayıt başarısız: ${AuthExceptionHelper.generateErrorMessage(e)}')),
           );
         }
       } finally {

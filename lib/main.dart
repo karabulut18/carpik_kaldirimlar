@@ -40,7 +40,7 @@ class CarpikKaldirimlarApp extends StatelessWidget {
           seedColor: Colors.deepOrange,
           brightness: Brightness.light,
         ),
-        // textTheme: GoogleFonts.robotoSerifTextTheme(),
+        textTheme: GoogleFonts.robotoSerifTextTheme(),
       ),
       darkTheme: ThemeData(
         useMaterial3: true,
@@ -48,9 +48,9 @@ class CarpikKaldirimlarApp extends StatelessWidget {
           seedColor: Colors.deepOrange,
           brightness: Brightness.dark,
         ),
-        // textTheme: GoogleFonts.robotoSerifTextTheme(
-        //   ThemeData(brightness: Brightness.dark).textTheme,
-        // ),
+        textTheme: GoogleFonts.robotoSerifTextTheme(
+          ThemeData(brightness: Brightness.dark).textTheme,
+        ),
       ),
       themeMode: ThemeMode.system,
     );

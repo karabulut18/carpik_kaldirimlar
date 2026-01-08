@@ -1,9 +1,7 @@
-import 'package:carpik_kaldirimlar/models/post.dart';
 import 'package:carpik_kaldirimlar/services/post_service.dart';
 import 'package:carpik_kaldirimlar/widgets/post_card.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class HomeView extends StatelessWidget {
@@ -21,7 +19,7 @@ class HomeView extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 80, horizontal: 24),
               decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+                color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
               ),
               child: Column(
                 children: [

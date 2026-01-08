@@ -1,4 +1,5 @@
 import 'package:carpik_kaldirimlar/models/post.dart';
+import 'package:carpik_kaldirimlar/services/auth_service.dart';
 import 'package:carpik_kaldirimlar/services/post_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -124,14 +125,20 @@ class _UsersTab extends StatelessWidget {
             final name = data['name'] ?? 'No Name';
             final role = data['role'] ?? 'user';
             
+            final currentUser = context.read<AuthService>().currentUserId;
+            final isSelf = uid == currentUser;
+
             return ListTile(
               leading: CircleAvatar(child: Text(name[0].toUpperCase())),
               title: Text('$name ($role)'),
               subtitle: Text(email),
-              trailing: IconButton(
-                icon: const Icon(Icons.delete_forever, color: Colors.red),
-                onPressed: () => _confirmDeleteUser(context, uid, name),
-              ),
+              onTap: () => context.push('/user/$uid'),
+              trailing: isSelf 
+                ? const Tooltip(message: 'Kendinizi silemezsiniz', child: IconButton(icon: Icon(Icons.block, color: Colors.grey), onPressed: null))
+                : IconButton(
+                  icon: const Icon(Icons.delete_forever, color: Colors.red),
+                  onPressed: () => _confirmDeleteUser(context, uid, name),
+                ),
             );
           },
         );

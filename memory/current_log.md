@@ -87,3 +87,37 @@ Major feature implementations:
 2. **Access Control**: Implemented strict firestore.rules (restricted updates to authors, prevented role escalation).
 3. **Refactoring**: Created AppUser model to encapsulate user data.
 4. **Sanitization**: Added link sanitization for markdown.
+
+### Entry 12 [2026-01-08 16:42:46]
+**Change Abstract:** Refactored Comments & Enhanced Profiles
+
+**Details:**
+# Session Memory Log
+
+## Date: 2026-01-08
+
+### Key Achievements
+1.  **Dashboard Removal**: The dashboard view and route were removed. Functionality was moved to the Admin Panel or integrated into the main navigation flow.
+2.  **Admin Panel Enhancements**:
+    - Added navigation to user public profiles from the admin user list.
+    - Implemented a safeguard preventing admins from deleting their own accounts.
+3.  **Comments Refactoring**:
+    - Migrated comments from subcollections (`posts/{id}/comments`) to a top-level collection (`comments`).
+    - Added `postId` to the `Comment` model to support this new schema.
+    - Enables querying comments by user (`authorId`) independent of the post.
+4.  **Profile Enhancements**:
+    - Added "Yazılar" (Posts) and "Yorumlar" (Comments) tabs to both `ProfileView` and `PublicUserView`.
+    - Created `CommentCard` widget for consistent comment display in lists.
+    - Added navigation from a user's comment list back to the original post.
+
+### Architectural Decisions
+- **Top-Level Comments**: We moved to a root `comments` collection to simplify "Get all comments by user" queries, which are expensive/difficult with subcollections (collection group queries require complex indexing).
+- **Public Shared Components**: Helper widgets for profile views were moved to `profile_view_helpers.dart` to be shared between the private `ProfileView` and public `PublicUserView`, reducing code duplication.
+
+### Pending Actions / Technical Debt
+- **Firestore Index**: The new "User Comments" feature requires a composite index on the `comments` collection: `authorId` (Ascending) + `date` (Descending). This must be created via the Firebase Console (clicking the link in the debug logs).
+- **Legacy Data**: Old comments stored in subcollections are not migrated. They will not appear in the new lists. A migration script would be needed if retaining old comments is critical.
+- **Flutter Web Issue**: A known assertion failure in `flutter run -d chrome` persists with the default CanvasKit renderer. Using `--web-renderer html` is the current workaround.
+
+### Next Steps 
+- Delete the old top-level `posts/{id}/comments` subcollections if we want to clean up the database (as requested by user, to be done later).
