@@ -121,3 +121,13 @@ Major feature implementations:
 
 ### Next Steps 
 - Delete the old top-level `posts/{id}/comments` subcollections if we want to clean up the database (as requested by user, to be done later).
+
+### Entry 12 [2026-01-10 03:46:58]
+**Change Abstract:** Git Integration and Profile Comments Refactor.
+
+**Details:**
+1. Initialized Git repository and pushed to remote.
+2. Updated README.md with comprehensive project documentation.
+3. Refactored Comments to use top-level collection for better querying.
+4. Implemented "My Comments" tab in Profile with Delete functionality.
+5. Added Admin capabilities to delete any comment.

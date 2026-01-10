@@ -258,7 +258,16 @@ class _PostDetailViewState extends State<PostDetailView> {
                 StreamBuilder<List<Comment>>(
                   stream: postService.getCommentsStream(widget.postId),
                   builder: (context, snapshot) {
-                     if (snapshot.hasError) return const Text('Yorumlar yüklenemedi');
+                     if (snapshot.hasError) {
+                        final error = snapshot.error.toString();
+                        if (error.contains('failed-precondition') || error.contains('requires an index')) {
+                           return const Padding(
+                             padding: EdgeInsets.all(16.0),
+                             child: Text('Lütfen Firestore Index oluşturun: Link için debug konsola bakın.', textAlign: TextAlign.center),
+                           );
+                        }
+                        return Text('Yorumlar yüklenemedi: $error');
+                     }
                      if (snapshot.connectionState == ConnectionState.waiting) {
                        return const Center(child: CircularProgressIndicator());
                      }
@@ -302,7 +311,7 @@ class _PostDetailViewState extends State<PostDetailView> {
                                  ],
                                ),
                              ),
-                             if (currentUserId != null && (currentUserId == comment.authorId || currentUserId == post.authorId))
+                             if (currentUserId != null && (currentUserId == comment.authorId || currentUserId == post.authorId || authService.isAdmin))
                                IconButton(
                                  icon: const Icon(Icons.delete_outline, size: 20, color: Colors.grey),
                                  onPressed: () {

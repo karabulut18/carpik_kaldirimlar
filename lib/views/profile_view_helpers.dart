@@ -17,7 +17,14 @@ class UserCommentsList extends StatelessWidget {
       stream: context.read<PostService>().getUserComments(userId),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return Center(child: Text('Hata: ${snapshot.error}'));
+          final error = snapshot.error.toString();
+          if (error.contains('failed-precondition') || error.contains('requires an index')) {
+             return const Center(child: Padding(
+               padding: EdgeInsets.all(16.0),
+               child: Text('Lütfen Firestore Index oluşturun: Link için debug konsola bakın.', textAlign: TextAlign.center),
+             ));
+          }
+          return Center(child: Text('Hata: $error'));
         }
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -43,6 +50,36 @@ class UserCommentsList extends StatelessWidget {
                 if(comments[index].postId.isNotEmpty) {
                   context.go('/post/${comments[index].postId}');
                 }
+              },
+              onDelete: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Yorumu Sil'),
+                    content: const Text('Bu yorumu silmek istiyor musunuz?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('İptal'),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          Navigator.pop(context);
+                          await context.read<PostService>().deleteComment(
+                            comments[index].postId, 
+                            comments[index].id
+                          );
+                          if (context.mounted) {
+                             ScaffoldMessenger.of(context).showSnackBar(
+                               const SnackBar(content: Text('Yorum silindi')),
+                             );
+                          }
+                        },
+                        child: const Text('Sil', style: TextStyle(color: Colors.red)),
+                      ),
+                    ],
+                  ),
+                );
               },
             );
           },
