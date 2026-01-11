@@ -2,6 +2,8 @@ import 'package:carpik_kaldirimlar/models/comment.dart';
 import 'package:carpik_kaldirimlar/models/post.dart';
 import 'package:carpik_kaldirimlar/services/auth_service.dart';
 import 'package:carpik_kaldirimlar/services/post_service.dart';
+import 'package:carpik_kaldirimlar/services/report_service.dart';
+import 'package:carpik_kaldirimlar/models/report.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -39,6 +41,76 @@ class _PostDetailViewState extends State<PostDetailView> {
 
   void _toggleLike(String userId) async {
     await context.read<PostService>().toggleLike(widget.postId, userId);
+  }
+
+  void _showReportDialog({required String reportedItemId, required String reportedAuthorId, required String type}) {
+    if (!context.read<AuthService>().isLoggedIn) {
+      context.go('/login');
+      return;
+    }
+    final reasonController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('${type == 'post' ? 'Yazıyı' : 'Yorumu'} Raporla'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Lütfen raporlama nedeninizi belirtin:'),
+            const SizedBox(height: 8),
+            TextField(
+              controller: reasonController,
+              decoration: const InputDecoration(
+                hintText: 'Neden?',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 3,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('İptal'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              final reason = reasonController.text.trim();
+              if (reason.isEmpty) return;
+
+              final authService = context.read<AuthService>();
+              final report = Report(
+                id: '',
+                reporterId: authService.currentUserId!,
+                reportedItemId: reportedItemId,
+                reportedAuthorId: reportedAuthorId,
+                type: type,
+                reason: reason,
+                date: DateTime.now(),
+              );
+              
+              Navigator.pop(context); // Close dialog
+              
+              try {
+                await context.read<ReportService>().createReport(report);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Raporunuz iletildi. Teşekkürler.')),
+                  );
+                }
+              } catch (e) {
+                 if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Hata oluştu: $e')),
+                  );
+                }
+              }
+            },
+            child: const Text('Raporla'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _addComment(String authorName, String authorId) async {
@@ -79,7 +151,13 @@ class _PostDetailViewState extends State<PostDetailView> {
             IconButton(
               icon: const Icon(Icons.edit),
               onPressed: () => context.go('/edit-post/${post.id}'),
-            ),
+            )
+          else if (isLoggedIn)
+             IconButton(
+               icon: const Icon(Icons.report_gmailerrorred),
+               tooltip: 'Yazıyı Raporla',
+               onPressed: () => _showReportDialog(reportedItemId: post.id, reportedAuthorId: post.authorId, type: 'post'),
+             ),
         ],
       ),
       body: SingleChildScrollView(

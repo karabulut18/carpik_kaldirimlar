@@ -1,6 +1,9 @@
 import 'package:carpik_kaldirimlar/models/post.dart';
 import 'package:carpik_kaldirimlar/services/auth_service.dart';
+import 'package:carpik_kaldirimlar/models/report.dart';
+
 import 'package:carpik_kaldirimlar/services/post_service.dart';
+import 'package:carpik_kaldirimlar/services/report_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -13,7 +16,7 @@ class AdminPanelView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Yönetim Paneli'),
@@ -21,6 +24,7 @@ class AdminPanelView extends StatelessWidget {
             tabs: [
               Tab(text: 'Yazılar', icon: Icon(Icons.article)),
               Tab(text: 'Kullanıcılar', icon: Icon(Icons.people)),
+              Tab(text: 'Raporlar', icon: Icon(Icons.report)),
             ],
           ),
         ),
@@ -28,6 +32,7 @@ class AdminPanelView extends StatelessWidget {
           children: [
             _PostsTab(),
             _UsersTab(),
+            _ReportsTab(),
           ],
         ),
       ),
@@ -173,5 +178,104 @@ class _UsersTab extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _ReportsTab extends StatelessWidget {
+  const _ReportsTab();
+  
+  @override
+  Widget build(BuildContext context) {
+    final reportService = context.watch<ReportService>();
+    
+    return StreamBuilder<List<Report>>(
+      stream: reportService.getReports(),
+      builder: (context, snapshot) {
+         if (snapshot.hasError) return Center(child: Text('Hata: ${snapshot.error}'));
+         if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+         
+         final reports = snapshot.data ?? [];
+         if (reports.isEmpty) return const Center(child: Text('Henüz rapor yok.'));
+         
+         return ListView.builder(
+           itemCount: reports.length,
+           itemBuilder: (context, index) {
+             final report = reports[index];
+             return ExpansionTile(
+               title: Text('${report.type.toUpperCase()} Raporu'),
+               subtitle: Text('Sebep: ${report.reason}\nTarih: ${DateFormat('d MMM HH:mm').format(report.date)}'),
+               trailing: IconButton(
+                 icon: const Icon(Icons.check, color: Colors.green),
+                 onPressed: () => _resolveReport(context, report.id),
+                 tooltip: 'Raporu Kapat (Sil)',
+               ),
+               children: [
+                  ListTile(
+                    title: const Text('Raporlayan ID'),
+                    subtitle: SelectableText(report.reporterId),
+                  ),
+                  ListTile(
+                    title: const Text('Raporlanan İçerik ID'),
+                    subtitle: SelectableText(report.reportedItemId),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.open_in_new),
+                      onPressed: () {
+                         if (report.type == 'post') {
+                            context.push('/post/${report.reportedItemId}');
+                         }
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        FilledButton.icon(
+                          onPressed: () => _deleteContent(context, report),
+                          icon: const Icon(Icons.delete_forever),
+                          label: const Text('İçeriği Sil'),
+                          style: FilledButton.styleFrom(backgroundColor: Colors.red),
+                        ),
+                      ],
+                    ),
+                  ),
+               ],
+             );
+           },
+         );
+      },
+    );
+  }
+
+  void _resolveReport(BuildContext context, String reportId) {
+     context.read<ReportService>().deleteReport(reportId);
+  }
+  
+  void _deleteContent(BuildContext context, Report report) async {
+     final confirm = await showDialog<bool>(
+       context: context,
+       builder: (context) => AlertDialog(
+         title: const Text('İçeriği Sil'),
+         content: const Text('Raporlanan içeriği silmek istediğinize emin misiniz?'),
+         actions: [
+            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('İptal')),
+            FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Sil')),
+         ],
+       ),
+     );
+     
+     if (confirm == true) {
+        if (!context.mounted) return;
+        if (report.type == 'post') {
+           await context.read<PostService>().deletePost(report.reportedItemId);
+        } else if (report.type == 'comment') {
+           await context.read<PostService>().deleteComment('', report.reportedItemId);
+        }
+        if (context.mounted) {
+           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('İçerik silindi.')));
+           _resolveReport(context, report.id);
+        }
+     }
   }
 }

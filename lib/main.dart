@@ -2,6 +2,7 @@ import 'package:carpik_kaldirimlar/firebase_options.dart';
 import 'package:carpik_kaldirimlar/router/app_router.dart';
 import 'package:carpik_kaldirimlar/services/auth_service.dart';
 import 'package:carpik_kaldirimlar/services/post_service.dart';
+import 'package:carpik_kaldirimlar/services/report_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -19,6 +20,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthService()),
         ChangeNotifierProvider(create: (_) => PostService()),
+        ChangeNotifierProvider(create: (_) => ReportService()),
       ],
       child: const CarpikKaldirimlarApp(),
     ),
