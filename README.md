@@ -13,39 +13,45 @@ A modern, social blogging platform built with **Flutter Web** and **Firebase**.
 - **Poetry Support**: Special handling for soft line breaks to preserve poem formatting.
 - **External Links**: Safe URL launching for external resources.
 - **View Counts**: Track how many people read each post (Atomic increments).
+- **Featured Posts**: Admins can highlight special posts on the home page.
+- **Tags & Categories**: Organize content for easier discovery.
 
 ### 🔍 Discovery
 - **Explore Page**: Browse all posts in a clean grid layout.
 - **Instant Search**: Client-side filtering by Title or Author as you type.
+- **Navigation**: Clean, routing-based navigation structure (GoRouter).
 
-### 💬 Social
-- **Comments**: Real-time comment system.
-- **Likes**: interactive like button with counters.
-- **Moderation**: 
-  - Post Authors can delete *any* comment on their post.
-  - Users can delete their *own* comments.
+### 💬 Social (New!)
+- **Advanced Comments**: 
+  - **Nested Replies**: Threaded conversations (Max depth 1).
+  - **Tagging**: Reply to users with auto-generated `@username` tags.
+  - **Status**: "Replying to..." context visible in profile tracking.
+- **Likes**: Interactive like buttons for both Posts and Comments.
+- **Reporting**: Community moderation tools to report inappropriate content.
 
-### 👤 User System
-- **Profile**: customizable profile with Avatar (initials) and **Bio**.
-- **Bio**: Supports Markdown formatting.
-- **Auth**: Email/Password authentication (expandable to Google Auth).
+### 👤 Profile Hub
+- **Public Profiles**: View any user's bio and published posts.
+- **Personal Dashboard**: 
+  - **My Posts**: Manage your published content.
+  - **My Comments**: Track and manage your discussions across the platform.
+- **Customization**: Editable Bio with Markdown support.
 
 ### 🛡️ Admin Panel
 - **Role-Based Access**: Secure Admin Panel accessible only to users with `role: 'admin'`.
-- **User Management**: View all users, ban/unban capabilities (UI ready).
-- **Dashboard**: Quick stats overview.
-- **Strict Authorization**: Admins can moderations (delete) but cannot edit user content.
+- **User Management**: View all users, ban/unban capabilities.
+- **Content Moderation**: Delete any post or comment to maintain community standards.
+- **Strict Authorization**: Server-side security rules prevent unauthorized role escalation.
 
 ### 🛡️ Security Architecture
-- **Firestore Rules**: Strict, role-based backend security policies.
+- **Firestore Rules**: Comprehensive RBAC (Role-Based Access Control) for all collections.
+- **Data Integrity**: 
+  - Comments can only be deleted by their author or an admin.
+  - User profiles can only be edited by the owner.
 - **Input Sanitization**: Markdown link sanitization to prevent XSS.
-- **Authorization**: Double-verification (UI + Logic) for all write operations.
-- **Data Integrity**: User roles are protected from client-side manipulation.
 
-### 🧑‍💻 Developer Experience
-- **Smart Logger**: An AI-powered CLI tool (`memory/logger.py`) that automatically generates semantic git commit messages and project log entries.
-  - Powered by **Google Gemini 2.0 Flash**.
-  - Context-aware: Reads your project history to match your logging style.
+### � Agentic Workflow
+- **Memory Log**: Automated session logging to track project evolution (`memory/current_log.md`).
+- **Smart Context**: Powered by Google Gemini 2.0 Flash for context-aware development.
 
 ## 🛠️ Tech Stack
 
@@ -71,7 +77,7 @@ A modern, social blogging platform built with **Flutter Web** and **Firebase**.
     cd carpik_kaldirimlar
     ```
 
-2.  **Install Favorites**
+2.  **Install Dependencies**
     ```bash
     flutter pub get
     ```
@@ -81,24 +87,15 @@ A modern, social blogging platform built with **Flutter Web** and **Firebase**.
     - Run `flutterfire configure` to generate `lib/firebase_options.dart`.
     - Enable **Authentication** (Email/Password).
     - Enable **Firestore Database**.
+    - **Indexes**: Create required composite indexes (links provided in debug console).
 
 4.  **Security Rules**
-    - **IMPORTANT**: Update your Firestore Rules to allow proper access.
-    - Admins need `role: 'admin'` in their user document.
+    - Deploy `firestore.rules` to secure your database.
 
-5.  **Environment Variables (Optional)**
-    - To use the **Smart Logger**, create a `.env` file in the root:
-      ```env
-      GEMINI_API_KEY=your_api_key_here
-      ```
-
-6.  **Run**
+5.  **Run**
     ```bash
     flutter run -d chrome
     ```
-
-## 📸 Screenshots
-*(Add screenshots here)*
 
 ## 📄 License
 
