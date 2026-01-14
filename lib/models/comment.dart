@@ -7,6 +7,10 @@ class Comment {
   final String authorName;
   final String authorId;
   final DateTime date;
+  final List<String> likes;
+  final String? replyToId;
+  final String? replyToUserName;
+  final int depth;
 
   Comment({
     required this.id,
@@ -15,6 +19,10 @@ class Comment {
     required this.authorName,
     required this.authorId,
     required this.date,
+    this.likes = const [],
+    this.replyToId,
+    this.replyToUserName,
+    this.depth = 0,
   });
 
   Map<String, dynamic> toMap() {
@@ -23,7 +31,12 @@ class Comment {
       'text': text,
       'authorName': authorName,
       'authorId': authorId,
+
       'date': Timestamp.fromDate(date),
+      'likes': likes,
+      'replyToId': replyToId,
+      'replyToUserName': replyToUserName,
+      'depth': depth,
     };
   }
 
@@ -44,7 +57,12 @@ class Comment {
       text: map['text'] ?? '',
       authorName: map['authorName'] ?? 'Anonymous',
       authorId: map['authorId'] ?? '',
+
       date: date,
+      likes: List<String>.from(map['likes'] ?? []),
+      replyToId: map['replyToId'],
+      replyToUserName: map['replyToUserName'],
+      depth: map['depth'] ?? 0,
     );
   }
 }

@@ -131,3 +131,33 @@ Major feature implementations:
 3. Refactored Comments to use top-level collection for better querying.
 4. Implemented "My Comments" tab in Profile with Delete functionality.
 5. Added Admin capabilities to delete any comment.
+
+### Entry 13 [2026-01-14 21:55:19]
+**Change Abstract:** Migrated from Python-based logger to Agentic Workflow.
+
+**Details:**
+- Removed legacy scripts: `memory/logger.py` and `memory/config.json`.
+- Removed intermediate manual script: `memory/agent.py`.
+- Created new Antigravity workflow: `.agent/workflows/update_memory.md`.
+- The logger is now integrated into the agent's chat capabilities, removing the need for external API management or git polling scripts.
+
+### Entry 14 [2026-01-14 23:59:00]
+**Change Abstract:** Enhanced Comment System (Replies, Likes, Tagging) and Security Hardening.
+
+**Details:**
+1.  **Comment System**:
+    - Implemented nested replies (Max depth 1).
+    - Added "Like" functionality for comments.
+    - Added user tagging support (`@username`) and auto-tagging on reply.
+    - Added "Replying to @user" context in Profile View comment lists.
+2.  **Security**:
+    - Updated `firestore.rules` to enforce RBAC for comments (Owner/Admin only delete).
+    - Patched `UserCommentsList` to hide delete button for unauthorized viewers.
+3.  **UI/UX**:
+    - Fixed `RenderFlex` overflow in Profile Header for long usernames.
+    - Fixed deprecated `value` usage in `CreatePostView`.
+4.  **Data Model**:
+    - Updated `AppUser` to include `username`.
+    - Updated `Comment` to include `likes`, `replyToId`, `replyToUserName`, `depth`.
+5.  **Infrastructure**:
+    - Identified required Firestore Composite Index: `comments` collection (`authorId` ASC, `date` DESC).

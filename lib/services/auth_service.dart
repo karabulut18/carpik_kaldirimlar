@@ -58,6 +58,7 @@ class AuthService extends ChangeNotifier {
         id: user.uid,
         email: user.email ?? '',
         name: user.displayName ?? user.email?.split('@')[0] ?? 'User',
+        username: user.email?.split('@')[0] ?? 'user${user.uid.substring(0, 5)}',
         role: 'user',
       );
       
@@ -140,6 +141,7 @@ class AuthService extends ChangeNotifier {
           id: _appUser!.id,
           email: _appUser!.email,
           name: name,
+          username: _appUser!.username,
           role: _appUser!.role,
           bio: bio ?? _appUser!.bio,
           createdAt: _appUser!.createdAt

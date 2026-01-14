@@ -1,7 +1,0 @@
-{
-  "prompt_count": 12,
-  "archive_threshold": 20,
-  "usage": "python3 memory/logger.py --smart",
-  "current_log": "memory/current_log.md",
-  "abstract": "A mobile social application with auth, posts, comments, and admin features."
-}

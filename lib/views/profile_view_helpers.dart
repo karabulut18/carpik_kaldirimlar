@@ -1,5 +1,6 @@
 import 'package:carpik_kaldirimlar/models/comment.dart';
 import 'package:carpik_kaldirimlar/services/post_service.dart';
+import 'package:carpik_kaldirimlar/services/auth_service.dart';
 import 'package:carpik_kaldirimlar/widgets/comment_card.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -51,7 +52,7 @@ class UserCommentsList extends StatelessWidget {
                   context.go('/post/${comments[index].postId}');
                 }
               },
-              onDelete: () {
+              onDelete: (context.read<AuthService>().currentUserId == comments[index].authorId) ? () {
                 showDialog(
                   context: context,
                   builder: (context) => AlertDialog(
@@ -80,7 +81,7 @@ class UserCommentsList extends StatelessWidget {
                     ],
                   ),
                 );
-              },
+              } : null,
             );
           },
         );

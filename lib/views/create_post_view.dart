@@ -20,6 +20,11 @@ class _CreatePostViewState extends State<CreatePostView> {
   final _excerptController = TextEditingController();
   final _contentController = TextEditingController();
   final _imageUrlController = TextEditingController();
+  final _tagsController = TextEditingController();
+  
+  String _selectedCategory = 'Genel';
+  bool _isFeatured = false;
+  final List<String> _categories = ['Genel', 'Edebiyat', 'Teknoloji', 'Yaşam', 'Sanat', 'Bilim', 'Spor'];
   
   bool _isLoading = false;
   bool _isEditing = false;
@@ -57,6 +62,13 @@ class _CreatePostViewState extends State<CreatePostView> {
       _excerptController.text = post.excerpt ?? '';
       _contentController.text = post.content ?? '';
       _imageUrlController.text = post.imageUrl ?? '';
+      _tagsController.text = post.tags.join(', ');
+      if (_categories.contains(post.category)) {
+        _selectedCategory = post.category;
+      } else {
+        _selectedCategory = 'Genel';
+      }
+      _isFeatured = post.isFeatured;
     }
   }
 
@@ -88,6 +100,9 @@ class _CreatePostViewState extends State<CreatePostView> {
             excerpt: _excerptController.text.isEmpty ? null : _excerptController.text,
             content: _contentController.text,
             imageUrl: _imageUrlController.text.isNotEmpty ? _imageUrlController.text : null,
+            tags: _tagsController.text.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList(),
+            category: _selectedCategory,
+            isFeatured: _isFeatured,
           );
           
           await postService.updatePost(updatedPost);
@@ -109,6 +124,9 @@ class _CreatePostViewState extends State<CreatePostView> {
             excerpt: _excerptController.text.isEmpty ? null : _excerptController.text,
             content: _contentController.text,
             imageUrl: _imageUrlController.text.isNotEmpty ? _imageUrlController.text : null,
+            tags: _tagsController.text.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList(),
+            category: _selectedCategory,
+            isFeatured: _isFeatured,
           );
 
           await postService.addPost(newPost);
@@ -138,6 +156,7 @@ class _CreatePostViewState extends State<CreatePostView> {
     _excerptController.dispose();
     _contentController.dispose();
     _imageUrlController.dispose();
+    _tagsController.dispose();
     super.dispose();
   }
 
@@ -184,6 +203,35 @@ class _CreatePostViewState extends State<CreatePostView> {
                     ),
                     // No validator needed for optional
                   ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: DropdownButtonFormField<String>(
+                          initialValue: _selectedCategory,
+                          decoration: const InputDecoration(
+                            labelText: 'Kategori',
+                            border: OutlineInputBorder(),
+                          ),
+                          items: _categories.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+                          onChanged: (v) {
+                            if (v != null) setState(() => _selectedCategory = v);
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: TextFormField(
+                          controller: _tagsController,
+                          decoration: const InputDecoration(
+                            labelText: 'Etiketler (virgülle ayırın)',
+                            hintText: 'örn: doğa, şiir, gezi',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 24),
                   TextFormField(
                     controller: _contentController,
@@ -203,6 +251,15 @@ class _CreatePostViewState extends State<CreatePostView> {
                       prefixIcon: Icon(Icons.link),
                     ),
                   ),
+                  const SizedBox(height: 16),
+                  if (Provider.of<AuthService>(context, listen: false).isAdmin)
+                    SwitchListTile(
+                      title: const Text('Öne Çıkarılan Yazı'),
+                      subtitle: const Text('Bu yazı ana sayfada manşet olarak gösterilecek.'),
+                      value: _isFeatured,
+                      onChanged: (v) => setState(() => _isFeatured = v),
+                      contentPadding: EdgeInsets.zero,
+                    ),
                   const SizedBox(height: 32),
                   Row(
                     children: [

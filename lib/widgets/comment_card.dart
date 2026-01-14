@@ -87,6 +87,16 @@ class CommentCard extends StatelessWidget {
                   ),
               ],
             ),
+             if (comment.replyToUserName != null)
+               Padding(
+                 padding: const EdgeInsets.only(top: 4, bottom: 4),
+                 child: Text(
+                   'Yanıtlanıyor: @${comment.replyToUserName}',
+                   style: theme.textTheme.bodySmall?.copyWith(
+                     color: theme.colorScheme.onSurfaceVariant,
+                   ),
+                 ),
+               ),
              const SizedBox(height: 8),
              Text(
                comment.text,

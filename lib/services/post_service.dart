@@ -9,6 +9,19 @@ class PostService extends ChangeNotifier {
 
   List<Post> get posts => List.unmodifiable(_posts);
 
+  List<Post> getPostsByCategory(String category) {
+    if (category == 'Genel') return posts;
+    return _posts.where((p) => p.category == category).toList();
+  }
+
+  List<Post> getPostsByTag(String tag) {
+    return _posts.where((p) => p.tags.contains(tag)).toList();
+  }
+
+  List<Post> get featuredPosts {
+    return _posts.where((p) => p.isFeatured).toList();
+  }
+
   PostService() {
     _postsCollection.orderBy('date', descending: true).snapshots().listen((snapshot) {
       _posts = snapshot.docs.map((doc) {
@@ -59,14 +72,36 @@ class PostService extends ChangeNotifier {
   // Top-level comments collection
   final CollectionReference _commentsCollection = FirebaseFirestore.instance.collection('comments');
 
-  Future<void> addComment(String postId, String text, String authorName, String authorId) async {
+  Future<void> addComment(String postId, String text, String authorName, String authorId, {String? replyToId, String? replyToUserName, int depth = 0}) async {
     await _commentsCollection.add({
       'postId': postId,
       'text': text,
       'authorName': authorName,
       'authorId': authorId,
       'date': FieldValue.serverTimestamp(),
+      'likes': [],
+      'replyToId': replyToId,
+      'replyToUserName': replyToUserName,
+      'depth': depth,
     });
+  }
+
+  Future<void> toggleCommentLike(String commentId, String userId) async {
+    final docRef = _commentsCollection.doc(commentId);
+    final doc = await docRef.get();
+
+    if (doc.exists) {
+      final data = doc.data() as Map<String, dynamic>;
+      final likes = List<String>.from(data['likes'] ?? []);
+
+      if (likes.contains(userId)) {
+        likes.remove(userId);
+      } else {
+        likes.add(userId);
+      }
+
+      await docRef.update({'likes': likes});
+    }
   }
 
   Future<void> deleteComment(String postId, String commentId) async {

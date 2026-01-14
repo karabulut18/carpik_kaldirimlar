@@ -9,6 +9,9 @@ class Post {
   final String? content;
   final int viewCount;
   final List<String> likes; // User IDs
+  final List<String> tags;
+  final String category;
+  final bool isFeatured;
 
   Post({
     required this.id,
@@ -21,6 +24,9 @@ class Post {
     this.content,
     this.viewCount = 0,
     this.likes = const [],
+    this.tags = const [],
+    this.category = 'Genel',
+    this.isFeatured = false,
   });
 
   int get likeCount => likes.length;
@@ -36,6 +42,9 @@ class Post {
       'imageUrl': imageUrl,
       'viewCount': viewCount,
       'likes': likes,
+      'tags': tags,
+      'category': category,
+      'isFeatured': isFeatured,
     };
   }
 
@@ -44,13 +53,16 @@ class Post {
       id: id,
       title: map['title'] ?? '',
       author: map['author'] ?? '',
-      authorId: map['authorId'] ?? '', // Default to empty if missing
+      authorId: map['authorId'] ?? '',
       date: DateTime.fromMillisecondsSinceEpoch(map['date'] ?? 0),
       excerpt: map['excerpt'],
       content: map['content'],
       imageUrl: map['imageUrl'],
       viewCount: map['viewCount'] ?? 0,
       likes: List<String>.from(map['likes'] ?? []),
+      tags: List<String>.from(map['tags'] ?? []),
+      category: map['category'] ?? 'Genel',
+      isFeatured: map['isFeatured'] ?? false,
     );
   }
 }
