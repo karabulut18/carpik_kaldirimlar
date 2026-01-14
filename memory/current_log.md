@@ -172,6 +172,20 @@ Major feature implementations:
     - `test/models/` (Comment, Post, AppUser): Verified JSON parsing, default values, and computed properties (`likeCount`, `isAdmin`, `username` generation).
 3.  **Widget Tests**:
     - `test/widgets/` (CommentCard, PostCard, LoginView): Verified rendering, user interactions, and form validation. Confirmed security UI logic.
-4.  **Service Tests**:
     - `test/services/post_service_test.dart`: Refactored `PostService` to support `isTest` mode. Verified local filtering logic (`category`, `tags`, `featured`) without needing Firestore connection.
 5.  **Results**: All tests passed. `flutter analyze` clean.
+
+### Entry 16 [2026-01-15 00:50:00]
+**Change Abstract:** Comprehensive Documentation & Security Hardening.
+
+**Details:**
+1.  **Documentation (`docs/`)**:
+    - **Architecture**: `models_and_structure.md` (Directory layout, Schema).
+    - **Security**: 
+        - `security_policy.md` (RBAC, Helper functions, Triple-Delete rule).
+        - `security_analysis.md` (Threat model, Risk assessment).
+    - **Testing**: `testing/report_001.md` (Baseline test results).
+2.  **Security Patch (`firestore.rules`)**:
+    - **Vulnerability**: Identified potential Privilege Escalation where a user could modify their own `role`.
+    - **Fix**: Split `allow write` into specific `create` and `update` rules. detailed checks ensure `role` field cannot be changed by non-admins.
+3.  **Status**: Project is fully documented, tested, and secured against critical RBAC threats.

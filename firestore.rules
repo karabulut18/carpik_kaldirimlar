@@ -29,7 +29,14 @@ service cloud.firestore {
     // - Owner/Admin: Write profile data
     match /users/{userId} {
       allow read: if true;
-      allow write: if isOwner(userId) || isAdmin();
+      
+      // Create: Must be self-registration as 'user', or Admin creating an account
+      allow create: if (isOwner(userId) && request.resource.data.role == 'user') || isAdmin();
+      
+      // Update: Owners cannot change their role. Admins can.
+      allow update: if (isOwner(userId) && request.resource.data.role == resource.data.role) || isAdmin();
+      
+      allow delete: if isOwner(userId) || isAdmin();
     }
 
     // Posts Collection
