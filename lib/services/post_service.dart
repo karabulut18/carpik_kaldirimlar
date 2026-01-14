@@ -4,10 +4,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class PostService extends ChangeNotifier {
-  final CollectionReference _postsCollection = FirebaseFirestore.instance.collection('posts');
+  CollectionReference? _postsCollection;
   List<Post> _posts = [];
 
   List<Post> get posts => List.unmodifiable(_posts);
+
+  @visibleForTesting
+  void setPosts(List<Post> posts) {
+    _posts = posts;
+    notifyListeners();
+  }
 
   List<Post> getPostsByCategory(String category) {
     if (category == 'Genel') return posts;
@@ -22,37 +28,43 @@ class PostService extends ChangeNotifier {
     return _posts.where((p) => p.isFeatured).toList();
   }
 
-  PostService() {
-    _postsCollection.orderBy('date', descending: true).snapshots().listen((snapshot) {
-      _posts = snapshot.docs.map((doc) {
-        return Post.fromMap(doc.id, doc.data() as Map<String, dynamic>);
-      }).toList();
-      notifyListeners();
-    }, onError: (error) {
-      debugPrint('Error listening to posts: $error');
-    });
+  PostService({bool isTest = false}) {
+    if (!isTest) {
+      _postsCollection = FirebaseFirestore.instance.collection('posts');
+      _postsCollection!.orderBy('date', descending: true).snapshots().listen((snapshot) {
+        _posts = snapshot.docs.map((doc) {
+          return Post.fromMap(doc.id, doc.data() as Map<String, dynamic>);
+        }).toList();
+        notifyListeners();
+      }, onError: (error) {
+        debugPrint('Error listening to posts: $error');
+      });
+      
+      _commentsCollection = FirebaseFirestore.instance.collection('comments');
+    }
   }
 
   Future<void> addPost(Post post) async {
-    await _postsCollection.add(post.toMap());
+    await _postsCollection?.add(post.toMap());
   }
 
   Future<void> deletePost(String id) async {
-    await _postsCollection.doc(id).delete();
+    await _postsCollection?.doc(id).delete();
   }
 
   Future<void> updatePost(Post post) async {
-     await _postsCollection.doc(post.id).update(post.toMap());
+     await _postsCollection?.doc(post.id).update(post.toMap());
   }
 
   Future<void> incrementViewCount(String postId) async {
-    await _postsCollection.doc(postId).update({
+    await _postsCollection?.doc(postId).update({
       'viewCount': FieldValue.increment(1),
     });
   }
 
   Future<void> toggleLike(String postId, String userId) async {
-    final docRef = _postsCollection.doc(postId);
+    if (_postsCollection == null) return;
+    final docRef = _postsCollection!.doc(postId);
     final doc = await docRef.get();
     
     if (doc.exists) {
@@ -70,10 +82,10 @@ class PostService extends ChangeNotifier {
   }
 
   // Top-level comments collection
-  final CollectionReference _commentsCollection = FirebaseFirestore.instance.collection('comments');
+  CollectionReference? _commentsCollection;
 
   Future<void> addComment(String postId, String text, String authorName, String authorId, {String? replyToId, String? replyToUserName, int depth = 0}) async {
-    await _commentsCollection.add({
+    await _commentsCollection?.add({
       'postId': postId,
       'text': text,
       'authorName': authorName,
@@ -87,7 +99,8 @@ class PostService extends ChangeNotifier {
   }
 
   Future<void> toggleCommentLike(String commentId, String userId) async {
-    final docRef = _commentsCollection.doc(commentId);
+    if (_commentsCollection == null) return;
+    final docRef = _commentsCollection!.doc(commentId);
     final doc = await docRef.get();
 
     if (doc.exists) {
@@ -106,11 +119,12 @@ class PostService extends ChangeNotifier {
 
   Future<void> deleteComment(String postId, String commentId) async {
     // postId parameter kept for compatibility, but not strictly needed for deletion by ID
-    await _commentsCollection.doc(commentId).delete();
+    await _commentsCollection?.doc(commentId).delete();
   }
 
   Stream<List<Comment>> getCommentsStream(String postId) {
-    return _commentsCollection
+    if (_commentsCollection == null) return const Stream.empty();
+    return _commentsCollection!
         .where('postId', isEqualTo: postId)
         .orderBy('date', descending: true)
         .snapshots()
@@ -122,7 +136,8 @@ class PostService extends ChangeNotifier {
   }
 
   Stream<List<Comment>> getUserComments(String userId) {
-    return _commentsCollection
+    if (_commentsCollection == null) return const Stream.empty();
+    return _commentsCollection!
         .where('authorId', isEqualTo: userId)
         .orderBy('date', descending: true)
         .snapshots()

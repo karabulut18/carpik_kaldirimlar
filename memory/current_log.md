@@ -161,3 +161,17 @@ Major feature implementations:
     - Updated `Comment` to include `likes`, `replyToId`, `replyToUserName`, `depth`.
 5.  **Infrastructure**:
     - Identified required Firestore Composite Index: `comments` collection (`authorId` ASC, `date` DESC).
+
+### Entry 15 [2026-01-15 00:20:00]
+**Change Abstract:** Implemented Unit and Widget Tests.
+
+**Details:**
+1.  **Infrastructure**:
+    - Added `flutter_test`, `mockito`, `build_runner` dependencies.
+2.  **Unit Tests**:
+    - `test/models/` (Comment, Post, AppUser): Verified JSON parsing, default values, and computed properties (`likeCount`, `isAdmin`, `username` generation).
+3.  **Widget Tests**:
+    - `test/widgets/` (CommentCard, PostCard, LoginView): Verified rendering, user interactions, and form validation. Confirmed security UI logic.
+4.  **Service Tests**:
+    - `test/services/post_service_test.dart`: Refactored `PostService` to support `isTest` mode. Verified local filtering logic (`category`, `tags`, `featured`) without needing Firestore connection.
+5.  **Results**: All tests passed. `flutter analyze` clean.
