@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:carpik_kaldirimlar/models/post.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -84,6 +85,20 @@ class PostCard extends StatelessWidget {
                   Text(
                     '${post.likeCount}',
                     style: theme.textTheme.bodySmall,
+                  ),
+                  const SizedBox(width: 12),
+                  InkWell(
+                    onTap: () {
+                      final url = 'https://carpik-kaldirimlar.web.app/post/${post.id}';
+                      Clipboard.setData(ClipboardData(text: url));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Bağlantı kopyalandı!')),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: Icon(Icons.share, size: 16, color: theme.colorScheme.outline),
+                    ),
                   ),
                 ],
               ),

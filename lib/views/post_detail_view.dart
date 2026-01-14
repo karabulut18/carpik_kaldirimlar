@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:carpik_kaldirimlar/models/comment.dart';
 import 'package:carpik_kaldirimlar/models/post.dart';
 import 'package:carpik_kaldirimlar/services/auth_service.dart';
@@ -221,6 +222,17 @@ class _PostDetailViewState extends State<PostDetailView> {
                tooltip: 'Yazıyı Raporla',
                onPressed: () => _showReportDialog(reportedItemId: post.id, reportedAuthorId: post.authorId, type: 'post'),
              ),
+          IconButton(
+            icon: const Icon(Icons.share),
+            tooltip: 'Paylaş',
+            onPressed: () {
+              final url = 'https://carpik-kaldirimlar.web.app/post/${post.id}';
+              Clipboard.setData(ClipboardData(text: url));
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Bağlantı kopyalandı!')),
+              );
+            },
+          ),
         ],
       ),
       body: SingleChildScrollView(

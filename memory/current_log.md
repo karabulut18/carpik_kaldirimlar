@@ -189,3 +189,27 @@ Major feature implementations:
     - **Vulnerability**: Identified potential Privilege Escalation where a user could modify their own `role`.
     - **Fix**: Split `allow write` into specific `create` and `update` rules. detailed checks ensure `role` field cannot be changed by non-admins.
 3.  **Status**: Project is fully documented, tested, and secured against critical RBAC threats.
+
+### Entry 17 [2026-01-15 00:55:00]
+**Change Abstract:** Production Deployment 🚀
+
+**Details:**
+1.  **Build**: `flutter build web --release` (CanvasKit).
+2.  **Config**: Updated `firebase.json` for SPA rewrites (`/index.html`).
+3.  **Security**: Deployed hardened `firestore.rules`.
+4.  **Release**:
+    - **Hosting URL**: https://carpik-kaldirimlar.web.app
+    - **Hosting URL**: https://carpik-kaldirimlar.web.app
+    - **Console**: https://console.firebase.google.com/project/carpik-kaldirimlar/overview
+
+### Entry 18 [2026-01-15 01:15:00]
+**Change Abstract:** Post-Deployment Polish & Handover.
+
+**Details:**
+1.  **Bug Fix**: Fixed `CreatePostView` redirecting to dead `/dashboard` route. Now redirects to Home or New Post.
+2.  **Feature**: Added **Share** button (Copy to Clipboard) to Feed and Post Detail views.
+3.  **Assets**: Optimized `icon.png` (576px) into proper web standards:
+    - `favicon.png` (32x32)
+    - `icons/Icon-192.png` & `512.png`
+    - Updated `manifest.json` for correct PWA install prompt.
+4.  **Conclusion**: Project is live, polished, and fully functional. Handing off to user.

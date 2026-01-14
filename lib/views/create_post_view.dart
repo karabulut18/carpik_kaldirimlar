@@ -52,7 +52,7 @@ class _CreatePostViewState extends State<CreatePostView> {
              ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Bu yazıyı düzenleme yetkiniz yok.')),
             );
-            context.go('/dashboard');
+            context.go('/');
           }
         });
         return;
@@ -135,7 +135,7 @@ class _CreatePostViewState extends State<CreatePostView> {
              ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Yazı yayınlandı!')),
             );
-            context.go('/dashboard');
+            context.go('/post/${newPost.id}');
           }
         }
       } catch (e) {
@@ -169,7 +169,7 @@ class _CreatePostViewState extends State<CreatePostView> {
         title: Text(_isEditing ? 'Yazıyı Düzenle' : 'Yeni Yazı Oluştur'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/dashboard'),
+          onPressed: () => context.go('/'),
         ),
       ),
       body: SingleChildScrollView(

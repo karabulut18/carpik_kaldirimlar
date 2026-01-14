@@ -1,11 +1,11 @@
 {
-    "name": "carpik_kaldirimlar",
-    "short_name": "carpik_kaldirimlar",
+    "name": "Çarpık Kaldırımlar",
+    "short_name": "Çarpık Kaldırımlar",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#FDFBFF",
+    "theme_color": "#005AC1",
+    "description": "Her hikaye bir adımla başlar. Sizinki burada.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
