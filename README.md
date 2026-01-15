@@ -2,6 +2,8 @@
 
 A modern, social blogging platform built with **Flutter Web** and **Firebase**.
 
+**Live Website:** [carpik-kaldirimlar.web.app](https://carpik-kaldirimlar.web.app)
+
 ![Status](https://img.shields.io/badge/Status-Active-success)
 ![Flutter](https://img.shields.io/badge/Flutter-3.x-blue)
 ![Firebase](https://img.shields.io/badge/Firebase-Auth%20%7C%20Firestore-orange)
