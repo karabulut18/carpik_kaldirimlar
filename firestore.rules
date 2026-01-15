@@ -24,17 +24,71 @@ service cloud.firestore {
 
     // --- Rules ---
 
+    // --- Validation Helpers ---
+
+    function isString(data, field, maxLen) {
+      return field in data && data[field] is string && data[field].size() <= maxLen;
+    }
+    
+    function isOptionalString(data, field, maxLen) {
+      return !(field in data) || (data[field] is string && data[field].size() <= maxLen);
+    }
+
+    function isNonEmptyString(data, field, maxLen) {
+      return isString(data, field, maxLen) && data[field].size() > 0;
+    }
+
+    function isInteger(data, field) {
+      return field in data && data[field] is int;
+    }
+    
+    function isOptionalInteger(data, field) {
+      return !(field in data) || (data[field] is int);
+    }
+
+    function isList(data, field, maxItems) {
+      return field in data && data[field] is list && data[field].size() <= maxItems;
+    }
+    
+    function isOptionalList(data, field, maxItems) {
+      return !(field in data) || (data[field] is list && data[field].size() <= maxItems);
+    }
+    
+    function isTimestamp(data, field) {
+      return field in data && data[field] is timestamp;
+    }
+    
+    function hasOnlyKeys(data, keys) {
+      return data.keys().hasOnly(keys);
+    }
+
+    // --- Rules ---
+
     // Users Collection
     // - Public: Read any profile
     // - Owner/Admin: Write profile data
     match /users/{userId} {
       allow read: if true;
       
+      // Validate user data structure
+      function isValidUser() {
+        let data = request.resource.data;
+        let allowedKeys = ['uid', 'name', 'username', 'email', 'bio', 'role', 'createdAt'];
+        return hasOnlyKeys(data, allowedKeys) &&
+               isNonEmptyString(data, 'name', 50) &&
+               isNonEmptyString(data, 'username', 30) &&
+               isNonEmptyString(data, 'email', 100) &&
+               isOptionalString(data, 'bio', 300) &&
+               (!('role' in data) || data.role in ['user', 'admin']);
+      }
+
       // Create: Must be self-registration as 'user', or Admin creating an account
-      allow create: if (isOwner(userId) && request.resource.data.role == 'user') || isAdmin();
+      allow create: if ((isOwner(userId) && request.resource.data.role == 'user') || isAdmin())
+                    && isValidUser();
       
       // Update: Owners cannot change their role. Admins can.
-      allow update: if (isOwner(userId) && request.resource.data.role == resource.data.role) || isAdmin();
+      allow update: if ((isOwner(userId) && request.resource.data.role == resource.data.role) || isAdmin())
+                    && isValidUser();
       
       allow delete: if isOwner(userId) || isAdmin();
     }
@@ -46,11 +100,33 @@ service cloud.firestore {
     match /posts/{postId} {
       allow read: if true;
       
+      function isValidPost() {
+        let data = request.resource.data;
+        let allowedKeys = ['title', 'content', 'author', 'authorId', 'excerpt', 'imageUrl', 'category', 'tags', 'date', 'viewCount', 'likes', 'isFeatured'];
+        return hasOnlyKeys(data, allowedKeys) &&
+               isNonEmptyString(data, 'title', 100) &&
+               isNonEmptyString(data, 'content', 20000) && 
+               isNonEmptyString(data, 'author', 50) &&
+               isOptionalString(data, 'excerpt', 500) &&
+               isOptionalString(data, 'imageUrl', 500) &&
+               isOptionalString(data, 'category', 50) &&
+               isList(data, 'tags', 20) &&
+               isOptionalList(data, 'likes', 10000) &&
+               isInteger(data, 'viewCount') &&
+               (!('isFeatured' in data) || data.isFeatured is bool);
+      }
+
       allow create: if isAuthenticated() 
-                    && request.resource.data.authorId == request.auth.uid;
+                    && request.resource.data.authorId == request.auth.uid
+                    && isValidPost();
                     
-      allow update: if (isAuthenticated() && (resource.data.authorId == request.auth.uid || isAdmin()))
-                    || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['viewCount']));
+      allow update: if (
+                      (isAuthenticated() && (resource.data.authorId == request.auth.uid || isAdmin()) && isValidPost())
+                      || (
+                        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['viewCount']) &&
+                        request.resource.data.viewCount == resource.data.viewCount + 1
+                      )
+                    );
                     
       allow delete: if isAuthenticated() 
                     && (resource.data.authorId == request.auth.uid || isAdmin());
@@ -62,9 +138,23 @@ service cloud.firestore {
     // - Owner/PostAuthor/Admin: Delete comments
     match /comments/{commentId} {
       allow read: if true;
+
+      function isValidComment() {
+        let data = request.resource.data;
+        let allowedKeys = ['text', 'authorName', 'authorId', 'postId', 'replyToId', 'replyToUserName', 'date', 'likes', 'depth'];
+        return hasOnlyKeys(data, allowedKeys) &&
+               isNonEmptyString(data, 'text', 1000) &&
+               isNonEmptyString(data, 'authorName', 50) &&
+               isString(data, 'postId', 100) &&
+               isOptionalString(data, 'replyToId', 100) &&
+               isOptionalString(data, 'replyToUserName', 50) &&
+               isOptionalList(data, 'likes', 10000) &&
+               isOptionalInteger(data, 'depth');
+      }
       
       allow create: if isAuthenticated() 
-                    && request.resource.data.authorId == request.auth.uid;
+                    && request.resource.data.authorId == request.auth.uid
+                    && isValidComment();
       
       // Delete if:
       // 1. You wrote the comment
@@ -81,8 +171,18 @@ service cloud.firestore {
     // - Authenticated: Create reports
     // - Admin: Read and manage reports
     match /reports/{reportId} {
+      
+      function isValidReport() {
+        let data = request.resource.data;
+        let allowedKeys = ['reason', 'type', 'reporterId', 'reportedItemId', 'reportedAuthorId', 'date', 'status'];
+        return hasOnlyKeys(data, allowedKeys) &&
+               isNonEmptyString(data, 'reason', 500) &&
+               (data.type == 'post' || data.type == 'comment');
+      }
+
       allow create: if isAuthenticated() 
-                    && request.resource.data.reporterId == request.auth.uid;
+                    && request.resource.data.reporterId == request.auth.uid
+                    && isValidReport();
                     
       allow read, update, delete: if isAdmin();
     }

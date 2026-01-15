@@ -185,9 +185,11 @@ class _CreatePostViewState extends State<CreatePostView> {
                   TextFormField(
                     controller: _titleController,
                     style: theme.textTheme.headlineMedium,
+                    maxLength: 100,
                     decoration: const InputDecoration(
                       hintText: 'Başlık',
                       border: InputBorder.none,
+                      counterText: "",
                     ),
                     validator: (v) => v?.isNotEmpty == true ? null : 'Başlık gerekli',
                   ),
@@ -196,6 +198,7 @@ class _CreatePostViewState extends State<CreatePostView> {
                   TextFormField(
                     controller: _excerptController,
                     maxLines: 2,
+                    maxLength: 500,
                     decoration: const InputDecoration(
                       labelText: 'Özet (Opsiyonel)',
                       border: OutlineInputBorder(),
@@ -228,6 +231,12 @@ class _CreatePostViewState extends State<CreatePostView> {
                             hintText: 'örn: doğa, şiir, gezi',
                             border: OutlineInputBorder(),
                           ),
+                          validator: (v) {
+                             if (v == null) return null;
+                             final tags = v.split(',').where((e) => e.trim().isNotEmpty).toList();
+                             if (tags.length > 20) return 'En fazla 20 etiket ekleyebilirsiniz.';
+                             return null;
+                          },
                         ),
                       ),
                     ],
@@ -236,19 +245,23 @@ class _CreatePostViewState extends State<CreatePostView> {
                   TextFormField(
                     controller: _contentController,
                     maxLines: 15,
+                    maxLength: 20000,
                     decoration: const InputDecoration(
                       labelText: 'İçerik',
                       border: OutlineInputBorder(),
                       alignLabelWithHint: true,
                     ),
+                    validator: (v) => (v?.length ?? 0) > 0 ? null : 'İçerik gerekli',
                   ),
                   const SizedBox(height: 24),
                   TextFormField(
                     controller: _imageUrlController,
+                    maxLength: 500,
                     decoration: const InputDecoration(
                       labelText: 'Kapak Görseli URL (Opsiyonel)',
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.link),
+                      counterText: "", 
                     ),
                   ),
                   const SizedBox(height: 16),

@@ -142,6 +142,7 @@ class CommentCard extends StatelessWidget {
                 border: OutlineInputBorder(),
               ),
               maxLines: 3,
+              maxLength: 500,
             ),
           ],
         ),

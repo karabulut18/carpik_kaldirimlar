@@ -84,6 +84,7 @@ class _PostDetailViewState extends State<PostDetailView> {
                 border: OutlineInputBorder(),
               ),
               maxLines: 3,
+              maxLength: 500,
             ),
           ],
         ),
@@ -450,6 +451,7 @@ class _PostDetailViewState extends State<PostDetailView> {
                            Expanded(
                              child: TextField(
                                controller: _commentController,
+                               maxLength: 1000,
                                decoration: InputDecoration(
                                  hintText: _replyingTo != null ? 'Yanıtınızı yazın...' : 'Bir yorum yaz...',
                                  border: const OutlineInputBorder(),
