@@ -11,8 +11,8 @@ A modern, social blogging platform built with **Flutter Web** and **Firebase**.
 ### 📖 Content
 - **Rich Text Editing**: Write posts using Markdown (Bold, Italic, Headers, Links, etc.).
 - **Poetry Support**: Special handling for soft line breaks to preserve poem formatting.
-- **External Links**: Safe URL launching for external resources.
-- **View Counts**: Track how many people read each post (Atomic increments).
+- **Link Previews**: Automatically generates rich social cards for links shared in posts.
+- **View Counts**: Tracks unique readership per post (Authors excluded from their own count).
 - **Featured Posts**: Admins can highlight special posts on the home page.
 - **Tags & Categories**: Organize content for easier discovery.
 
@@ -21,7 +21,7 @@ A modern, social blogging platform built with **Flutter Web** and **Firebase**.
 - **Instant Search**: Client-side filtering by Title or Author as you type.
 - **Navigation**: Clean, routing-based navigation structure (GoRouter).
 
-### 💬 Social (New!)
+### 💬 Social
 - **Advanced Comments**: 
   - **Nested Replies**: Threaded conversations (Max depth 1).
   - **Tagging**: Reply to users with auto-generated `@username` tags.
@@ -42,16 +42,23 @@ A modern, social blogging platform built with **Flutter Web** and **Firebase**.
 - **Content Moderation**: Delete any post or comment to maintain community standards.
 - **Strict Authorization**: Server-side security rules prevent unauthorized role escalation.
 
-### 🛡️ Security Architecture
-- **Firestore Rules**: Comprehensive RBAC (Role-Based Access Control) for all collections.
-- **Data Integrity**: 
-  - Comments can only be deleted by their author or an admin.
-  - User profiles can only be edited by the owner.
-- **Input Sanitization**: Markdown link sanitization to prevent XSS.
+## 📂 Project Structure
 
-### � Agentic Workflow
-- **Memory Log**: Automated session logging to track project evolution (`memory/current_log.md`).
-- **Smart Context**: Powered by Google Gemini 2.0 Flash for context-aware development.
+A quick guide to navigating the codebase:
+
+```
+lib/
+├── models/         # Data classes (Post, Comment, User, Report)
+├── services/       # Business logic & Firebase interactions (AuthService, PostService)
+├── views/          # Full-screen pages (HomeView, PostDetailView, LoginView)
+├── widgets/        # Reusable UI components
+│   ├── post_card.dart          # The main feed item
+│   ├── comment_card.dart       # Interactive comment item
+│   ├── link_preview_card.dart  # Social preview for external links
+│   └── ...
+├── utils/          # Helpers (Exception extraction, Date formatting)
+└── main.dart       # App entry point & Router configuration
+```
 
 ## 🛠️ Tech Stack
 
@@ -62,6 +69,7 @@ A modern, social blogging platform built with **Flutter Web** and **Firebase**.
 - **State Management**: [Provider](https://pub.dev/packages/provider)
 - **Routing**: [go_router](https://pub.dev/packages/go_router)
 - **Markdown**: [flutter_markdown](https://pub.dev/packages/flutter_markdown)
+- **Link Previews**: [any_link_preview](https://pub.dev/packages/any_link_preview)
 
 ## 🚀 Getting Started
 
@@ -91,6 +99,9 @@ A modern, social blogging platform built with **Flutter Web** and **Firebase**.
 
 4.  **Security Rules**
     - Deploy `firestore.rules` to secure your database.
+    ```bash
+    firebase deploy --only firestore:rules
+    ```
 
 5.  **Run**
     ```bash
