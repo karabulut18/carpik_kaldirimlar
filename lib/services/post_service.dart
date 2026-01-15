@@ -45,7 +45,7 @@ class PostService extends ChangeNotifier {
   }
 
   Future<void> addPost(Post post) async {
-    await _postsCollection?.add(post.toMap());
+    await _postsCollection?.doc(post.id).set(post.toMap());
   }
 
   Future<void> deletePost(String id) async {

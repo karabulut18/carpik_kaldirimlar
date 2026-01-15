@@ -31,7 +31,7 @@ service cloud.firestore {
     }
     
     function isOptionalString(data, field, maxLen) {
-      return !(field in data) || (data[field] is string && data[field].size() <= maxLen);
+      return !(field in data) || data[field] == null || (data[field] is string && data[field].size() <= maxLen);
     }
 
     function isNonEmptyString(data, field, maxLen) {
@@ -43,7 +43,7 @@ service cloud.firestore {
     }
     
     function isOptionalInteger(data, field) {
-      return !(field in data) || (data[field] is int);
+      return !(field in data) || data[field] == null || (data[field] is int);
     }
 
     function isList(data, field, maxItems) {
@@ -51,7 +51,7 @@ service cloud.firestore {
     }
     
     function isOptionalList(data, field, maxItems) {
-      return !(field in data) || (data[field] is list && data[field].size() <= maxItems);
+      return !(field in data) || data[field] == null || (data[field] is list && data[field].size() <= maxItems);
     }
     
     function isTimestamp(data, field) {
