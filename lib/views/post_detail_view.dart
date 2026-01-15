@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:carpik_kaldirimlar/widgets/link_preview_card.dart';
 import 'package:carpik_kaldirimlar/models/comment.dart';
 import 'package:carpik_kaldirimlar/models/post.dart';
 import 'package:carpik_kaldirimlar/services/auth_service.dart';
@@ -32,7 +33,14 @@ class _PostDetailViewState extends State<PostDetailView> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<PostService>().incrementViewCount(widget.postId);
+      final authService = context.read<AuthService>();
+      final postService = context.read<PostService>();
+      final post = postService.getPost(widget.postId);
+      
+      // Only increment if the viewer is NOT the author
+      if (post != null && authService.currentUserId != post.authorId) {
+        postService.incrementViewCount(widget.postId);
+      }
     });
   }
   
@@ -40,6 +48,14 @@ class _PostDetailViewState extends State<PostDetailView> {
   void dispose() {
     _commentController.dispose();
     super.dispose();
+  }
+
+  String? _extractFirstLink(String? content) {
+    if (content == null) return null;
+    final urlRegExp = RegExp(
+        r'https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&//=]*)');
+    final match = urlRegExp.firstMatch(content);
+    return match?.group(0);
   }
 
   void _toggleLike(String userId) async {
@@ -372,6 +388,10 @@ class _PostDetailViewState extends State<PostDetailView> {
                   },
                 ),
                 const SizedBox(height: 32),
+                if (_extractFirstLink(post.content) != null) ...[
+                  LinkPreviewCard(url: _extractFirstLink(post.content)!),
+                  const SizedBox(height: 32),
+                ],
                 if (post.tags.isNotEmpty) ...[
                   Wrap(
                     spacing: 8,

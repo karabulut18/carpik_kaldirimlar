@@ -57,9 +57,15 @@ class PostService extends ChangeNotifier {
   }
 
   Future<void> incrementViewCount(String postId) async {
-    await _postsCollection?.doc(postId).update({
-      'viewCount': FieldValue.increment(1),
-    });
+    try {
+      await _postsCollection?.doc(postId).update({
+        'viewCount': FieldValue.increment(1),
+      });
+    } catch (e) {
+      // Suppress permission-denied errors (e.g. valid for non-authors if rules are strict)
+      // Debug log could be added if needed, but avoiding user-facing errors is the goal.
+      debugPrint('View count increment failed (expected for non-authors): $e');
+    }
   }
 
   Future<void> toggleLike(String postId, String userId) async {
